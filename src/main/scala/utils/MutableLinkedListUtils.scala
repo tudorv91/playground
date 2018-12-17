@@ -1,22 +1,24 @@
 package utils
 
+import scala.util.Random
+
 object MutableLinkedListUtils {
-  def generateCyclic[T: RandomOf](length: Int): MutableNode[T] = {
-    val randomGenerator = implicitly[RandomOf[T]]
-
-    if(length == 0) null
+  def generateCyclic(length: Int): Option[MutableNode[Boolean]] =
+    if (length == 0)
+      None
     else {
-      val head = MutableNode(randomGenerator.random, null, null)
+      val head = MutableNode(Random.nextBoolean(), null)
 
-      var tail = head
-      for(_ <- 1 until length) {
-        val newTail = MutableNode(randomGenerator.random, tail, null)
-        tail.next = newTail
-        tail = newTail
-      }
-      tail.next = head
+      val tail = List.fill(length - 1)(MutableNode(Random.nextBoolean(), null))
 
-      head
+      val last = (head :: tail).reduceLeft(chain)
+
+      last.next = head
+      Some(head)
     }
+
+  private def chain(first: MutableNode[Boolean], second: MutableNode[Boolean]): MutableNode[Boolean] = {
+    first.next = second
+    second
   }
 }
